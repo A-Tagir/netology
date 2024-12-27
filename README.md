@@ -32,7 +32,7 @@ docker push atagir/custom-nginx:1.0.0
 #
 Задание 3
 #
-*Подключение к стандартному потоку ввода/вывода/ошибок осуществляется командой
+* Подключение к стандартному потоку ввода/вывода/ошибок осуществляется командой
 docker attach custom-nginx-t2
 
 Если после подключения нажать Ctrl-c, то в контейнер будет отправлен сигнал SIGKILL
@@ -48,29 +48,95 @@ docker attach custom-nginx-t2 --sig-proxy=false
 Также если запустить контейнер с ключем -t то при нажатии Ctrl-c трижды консоль будет
 отключаться не останавливая контейнер.
 ![container not stopped](https://github.com/A-Tagir/netology/blob/main/Homework4_custom-nginx_attach_not_stopped.jpg)
-#
-Задание 4
-#
 
- 
-* Пункт 10 Ответ: Замена порта в конфиге nginx с 80 на 81 приводит к тому, что веб-сервер становится 
+* Далее перезапустил контейнер и установил mc
+  apt install mc
+  отредактировал конфиг nginx заменив порт "listen 80" на "listen 81"
+  nginx -s reload
+![nginx on 81](https://github.com/A-Tagir/netology/blob/main/Homework4_custom-nginx_1.jpg)
+Видим, что замена порта в конфиге nginx с 80 на 81 приводит к тому, что веб-сервер становится 
 недоступен снаружи контейнера, поскольку наружу контейнера порт 81 не открыт
 (это не задано в Dockerfile или при запуске).
 
-* Пункт 11 Ответ: Чтобы это исправить не пересобирая образ, останавливаем контейнер,
+Чтобы это исправить не пересобирая образ, останавливаем контейнер,
 заходим в /var/lib/docker/ и меняем конфигурацию контейнера в двух конфигах 
 (ExposedPorts и PortBindings 80->81).
 Далее нужно сделать service docker restart (перезапуск демона docker)
 Далее запускаем контейнер и убеждаемся, что вэб-сервер снова доступен. Если не перезапустить 
 докер, и запустить сразу контейнер то конфиги перезапишутся старыми вариантами.
-На практике править вручную конфиги не строит?
+На практике править вручную конфиги думаю строит.
+docker ps показывает что контейнер теперь пробросил 81 порт на 8080.
+Теперь удаляем работающий контейнер
+docker -rm -f custom-nginx-t2
+docker ps -a показывает что все удалено:
+![nginx on 81 to 8080 removed](https://github.com/A-Tagir/netology/blob/main/Homework4_custom-nginx_2.jpg)
+#
+Задание 4
+#
+* Запускаю первый контейнер из образа centos
+docker run -dt --name centos1 -v $(pwd):/data centos /bin/bash
+* Запускаю второй контейнер из образа centos
+  docker run -dt --name centos2 -v $(pwd):/data centos /bin/bash
+* Заходим в первый контейнер и создаем файл Solution4
+  docker exec -it centos1 /bin/bash
+  cd data
+  echo 'Test netology Solution 4' > Solution4
+  exit
+* Заходим во второй контейнер
+  docker exec -it centos2 /bin/bash
+  cd data
+  ls
+Видим что новый файл здесь тоже доступен:
+![centos 1,2](https://github.com/A-Tagir/netology/blob/main/Homework4_CENTOS_volume.jpg)
 
-#Решение задача 5 введение в докер
-
-* пункт 1: Ответ: запустился файл compose.yaml поскольку, согласно документации,
+#
+Задание 5
+#
+* Создал согласно заданию файлы compose.yaml и docker-compose.yaml
+  запустил командой
+  docker compose up -d
+* запустился файл compose.yaml поскольку, согласно документации,
 это канонический и предпочитаемый вариант. Второй вариант именования тоже допустим,
 но при наличии нескольких будет выбран канонический вариант.
+* Далее в файл compose.yaml сделал include
+  include:
+    - docker-compose.yaml
+и теперь запустятся сервисы из обоих файлов.
+![compose up](https://github.com/A-Tagir/netology/blob/main/Homework4_Compose_1.jpg)
 
-* пункт 7: Ответ: После удаления файла compose.yaml в проекте появился контейнер которого нет
-в манифесте. Предлагается запустить команду повторно, что удалит конейнер, который не описан в манифесте.
-что я и сделал. Далее оставновил проект командой docker compose down
+* Далее в созданный registry деплоим образ custom-nginx как custom-nginx:latest
+  docker tag custom-nginx:latest localhost:5000/atagir/custom-nginx
+docker tag atagir/custom-nginx localhost:5000/custom-nginx:latest
+docker tag custom-nginx:latest localhost:5000/custom-nginx:1.0.0
+docker tag atagir/custom-nginx:latest localhost:5000/custom-nginx:1.0.0
+docker tag --help
+docker tag atagir/custom-nginx:1.0.0 localhost:5000/custom-nginx:latest
+docker push localhost:5000/custom-nginx:latest
+https://127.0.0.1:9000
+links https://127.0.0.1:9000
+* Далее делаю настройку portainer и деплою следующий компоуз:
+
+version: '3'
+
+services:
+  nginx:
+    image: 127.0.0.1:5000/custom-nginx
+    ports:
+      - "9090:80"
+* теперь делаю inspect:
+![portiner inspect](https://github.com/A-Tagir/netology/blob/main/Homework4_Portainer6.jpg)
+
+* теперь согласно заданию удаляю файла compose.yaml и делаю
+  docker compose up -d
+  и получаю сообщение, что есть контейнеры для которых нет описания в compose конфиге.
+  Запускаю команду 
+  docker compose up -d --remove-orphans
+  и контейнер не описанный в yaml файле удаляется.
+  далее 
+  оставновил проект командой docker compose down
+![remove_orphaned](https://github.com/A-Tagir/netology/blob/main/Homework4_Compose7.jpg)
+Чтобы остановить одной командой сразу
+docker compose down --remove-orphans
+Это удалит контейнеры которые не описаны с yaml файле и остановит проект.
+
+
