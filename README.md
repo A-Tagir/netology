@@ -4,7 +4,7 @@
 Задание 1
 #
 * Создаю виртуальную машину Linux Ubuntu в Hyper-V и устанавливаю докер:
-* 
+ 
 apt install docker-ce
 
 systemctl status docker
