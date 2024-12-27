@@ -4,29 +4,47 @@
 Задание 1
 #
 * Создаю виртуальную машину Linux Ubuntu в Hyper-V и устанавливаю докер:
+* 
 apt install docker-ce
+
 systemctl status docker
+
 apt-get install docker-compose-plugin
+
 docker compose version
-Docker Compose version v2.32.1
+
+Docker Compose version
+
+v2.32.1
+
 * зарегистрировался на докерхаб и создал публичный репозиторий с именем "custom-nginx"
 [docker hub](https://hub.docker.com/repository/docker/atagir/custom-nginx/general)
 * скачал образ nginx:1.21.1
+  
   docker pull nginx:1.21.1
+
 * Создал Dockerfile и заменил дефолтную индекс страницу 
 [Dockerfile](https://github.com/A-Tagir/netology/blob/main/Dockerfile)
-* собрал образ 
+* собрал образ
+  
   docker build . -f Dockerfile --tag nginx:1.0.0
+
 * отправил в докерхаб:
+  
 docker push atagir/custom-nginx:1.0.0
+
 [docker image](https://hub.docker.com/repository/docker/atagir/custom-nginx/general)
 #
 Задание 2
 #
 * Запустил образ custom-nginx:1.0.0 согласно требованиям
+  
   docker run -d -p 8080:80 --name ATG-custom-nginx-t2 atagir/custom-nginx:1.0.0  
+
 * Переименовал
+  
   docker rename ATG-custom-nginx-t2 custom-nginx-t2
+  
 * Вызвал curl 127.0.0.1:8080
 ![curl ok](https://github.com/A-Tagir/netology/blob/main/Homework4_custom-nginx.jpg)
 #
