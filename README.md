@@ -69,21 +69,30 @@ docker attach custom-nginx-t2 --sig-proxy=false
 На практике править вручную конфиги думаю строит.
 docker ps показывает что контейнер теперь пробросил 81 порт на 8080.
 Теперь удаляем работающий контейнер
+
 docker -rm -f custom-nginx-t2
+
 docker ps -a показывает что все удалено:
+
 ![nginx on 81 to 8080 removed](https://github.com/A-Tagir/netology/blob/main/Homework4_custom-nginx_2.jpg)
 #
 Задание 4
 #
 * Запускаю первый контейнер из образа centos
+* 
 docker run -dt --name centos1 -v $(pwd):/data centos /bin/bash
+
 * Запускаю второй контейнер из образа centos
   docker run -dt --name centos2 -v $(pwd):/data centos /bin/bash
 * Заходим в первый контейнер и создаем файл Solution4
   docker exec -it centos1 /bin/bash
+  
   cd data
+
   echo 'Test netology Solution 4' > Solution4
+
   exit
+
 * Заходим во второй контейнер
   docker exec -it centos2 /bin/bash
   cd data
