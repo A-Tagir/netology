@@ -129,16 +129,26 @@ services:
 ![portiner inspect](https://github.com/A-Tagir/netology/blob/main/Homework4_Portainer6.jpg)
 
 * теперь согласно заданию удаляю файла compose.yaml и делаю
+  
   docker compose up -d
+  
   и получаю сообщение, что есть контейнеры для которых нет описания в compose конфиге.
   Запускаю команду 
+  
   docker compose up -d --remove-orphans
+  
   и контейнер не описанный в yaml файле удаляется.
-  далее 
-  оставновил проект командой docker compose down
+  
+  далее оставновил проект командой 
+  
+  docker compose down
+
 ![remove_orphaned](https://github.com/A-Tagir/netology/blob/main/Homework4_Compose7.jpg)
+
 Чтобы остановить одной командой сразу
-docker compose down --remove-orphans
+
+ docker compose down --remove-orphans
+
 Это удалит контейнеры которые не описаны с yaml файле и остановит проект.
 
 
